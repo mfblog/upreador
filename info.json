@@ -1,8 +1,6 @@
 {
   "username": "admin",
-  "password": "12345678",
-  "reader_addr": "http://127.0.0.1:4396",
-  "remote_booksource": [
-    "https://www.yckceo.com/yuedu/shuyuans/json/id/613.json"
-  ]
+  "password": "302562020",
+  "reader_addr": "http://chirsemby.top:4396/#/",
+  "remote_booksource": "https://www.yckceo.com/yuedu/shuyuans/json/id/594.json"
 }
