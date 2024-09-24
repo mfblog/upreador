@@ -17,5 +17,3 @@
 
 执行脚本
 `python booksource.py`
-
-```
