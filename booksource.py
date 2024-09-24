@@ -26,7 +26,7 @@ async def login(session):
 
         # 判断是否登录成功
         if result.get("isSuccess"):
-            print("登录成功")
+            print("登录成功", result)
             return True  # 这里可以返回 True 或者直接返回 None
         else:
             print("登录失败:", result.get("errorMsg", "未知错误"))
