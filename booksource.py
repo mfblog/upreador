@@ -1,6 +1,7 @@
-import requests
 import orjson
-import urllib.parse
+import aiohttp
+import asyncio
+
 
 with open("./info.json") as f:
     data = orjson.loads(f.read())
@@ -9,52 +10,49 @@ username = data["username"]
 password = data["password"]
 remote_bs = data["remote_booksource"].strip()  # 去掉多余空格
 reader_addr = data["reader_addr"]
-session = requests.session()
+
+login_data = {"username": username, "password": password, "isLogin": True}
 
 
-def login():
-    login_url = "/reader3/login"
-    url = urllib.parse.urljoin(reader_addr, login_url)
-    # print(url)
-    data = {"username": username, "password": password, "isLogin": True}
-    headers = {
-        "Content-Type": "application/json",
-    }
-    result = session.post(url, json=data, headers=headers).json()
-    if str(result["isSuccess"]).lower() == "true":
-        print("登陆成功")
-    else:
-        print(result)
+async def get_booksource():
+    async with aiohttp.ClientSession() as session:
+        async with session.get(remote_bs) as resp:
+            if resp.status == 200:
+                return await resp.json()
+            else:
+                print("Get booksource failed, Please check your remote booksource url")
 
 
-def deleteBookSource():
-    deleteBookSource_url = "/reader3/deleteAllBookSources"
-    url = urllib.parse.urljoin(reader_addr, deleteBookSource_url)
-    result = session.post(url).json()
-    if str(result["isSuccess"]).lower() == "true":
-        print("书源删除成功")
-    else:
-        print(result)
+# Update reader booksources
+async def update_booksource():
+    async with aiohttp.ClientSession(base_url=reader_addr) as session:
+        headers = {"Content-Type": "application/json"}
+        async with session.request(
+            "POST", "/reader3/login", json=login_data, headers=headers
+        ) as response:
+            if response.status == 200:
+                print("Login success")
+            else:
+                print("Login failed, Please check your username and password")
+
+    async with aiohttp.ClientSession(base_url=reader_addr) as session:
+        headers = {"Content-Type": "application/json"}
+        async with session.request(
+            "POST", "/reader3/deleteAllBookSources", headers=headers
+        ) as response:
+            assert response.status == 200
+            print("Delete all booksources success")
+
+        json = await get_booksource()
+        async with session.request(
+            "POST", "/reader3/saveBookSources", json=json, headers=headers
+        ) as response:
+            assert response.status == 200
+            print("Update booksources success")
 
 
-def get_remotebs():
-    return requests.get(remote_bs).json()
+async def main():
+    await update_booksource()
 
 
-def send_bs():
-    remote_booksource = "/reader3/saveBookSources"
-    url = urllib.parse.urljoin(reader_addr, remote_booksource)
-    headers = {
-        "Content-Type": "application/json",
-    }
-    data = get_remotebs()
-    result = session.post(url, json=data, headers=headers).json()
-    if str(result["isSuccess"]).lower() == "true":
-        print("新增书源成功")
-    else:
-        print(result)
-
-
-login()
-deleteBookSource()
-send_bs()
+asyncio.run(main())
