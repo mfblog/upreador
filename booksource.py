@@ -8,12 +8,13 @@ with open("./info.json") as f:
 
 username = data["username"]
 password = data["password"]
-remote_bs = data["remote_booksource"].strip()  # 去掉多余空格
+remote_bs = data["remote_booksource"].strip()
 reader_addr = data["reader_addr"]
 
 login_data = {"username": username, "password": password, "isLogin": True}
 
 
+# Get remote booksource
 async def get_booksource():
     async with aiohttp.ClientSession() as session:
         async with session.get(remote_bs) as resp:
@@ -27,28 +28,32 @@ async def get_booksource():
 async def update_booksource():
     async with aiohttp.ClientSession(base_url=reader_addr) as session:
         headers = {"Content-Type": "application/json"}
+        # login reader
         async with session.request(
             "POST", "/reader3/login", json=login_data, headers=headers
         ) as response:
-            if response.status == 200:
+            if "true" in await response.text():
                 print("Login success")
             else:
-                print("Login failed, Please check your username and password")
+                print("Login failed")
 
-    async with aiohttp.ClientSession(base_url=reader_addr) as session:
-        headers = {"Content-Type": "application/json"}
+        # delete All BookSources
         async with session.request(
             "POST", "/reader3/deleteAllBookSources", headers=headers
         ) as response:
-            assert response.status == 200
-            print("Delete all booksources success")
-
+            if "true" in await response.text():
+                print("Delete all booksources success")
+            else:
+                print("Delete all booksources failed")
+        # Update booksources wi  reader
         json = await get_booksource()
         async with session.request(
             "POST", "/reader3/saveBookSources", json=json, headers=headers
         ) as response:
-            assert response.status == 200
-            print("Update booksources success")
+            if "true" in await response.text():
+                print("Update booksources success")
+            else:
+                print("Update booksources failed")
 
 
 async def main():
