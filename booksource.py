@@ -3,15 +3,13 @@ import aiohttp
 import asyncio
 
 
-with open("./info.json") as f:
+with open("./data/info.json") as f:
     data = orjson.loads(f.read())
 
 username = data["username"]
 password = data["password"]
 remote_bs = data["remote_booksource"].strip()
 reader_addr = data["reader_addr"]
-
-login_data = {"username": username, "password": password, "isLogin": True}
 
 
 # Get remote booksource
@@ -28,6 +26,7 @@ async def get_booksource():
 async def update_booksource():
     async with aiohttp.ClientSession(base_url=reader_addr) as session:
         headers = {"Content-Type": "application/json"}
+        login_data = {"username": username, "password": password, "isLogin": True}
         # login reader
         async with session.request(
             "POST", "/reader3/login", json=login_data, headers=headers
