@@ -6,14 +6,50 @@
 
 ## 安装与使用
 
+### 本地执行
+
 拉取代码到本地目录
-`git clone https://github.com/akiooo45/upreador.git`
+
+```bash
+git clone https://github.com/akiooo45/upreador.git
+```
 
 安装依赖
-`pip install -r requirements.txt`
+
+```bash
+pip install -r requirements.txt
+```
 
 根据需求修改info.json文件
-`vim info.json`
+
+```bash
+vim info.json
+```
 
 执行脚本
-`python booksource.py`
+
+```bash
+python booksource.py
+```
+
+### 使用docker
+
+拉取镜像
+
+```bash
+docker pull meifly/usersu-preador
+```
+
+修改info.json文件
+
+执行容器(此命令在脚本执行完成后会自行删除容器)
+
+```bash
+docker run -it --rm  --name upderor -v data:/root/data meifly/usersu-preador
+```
+
+## 感谢
+
+本项目感谢以下贡献者：
+
+- **[mfblog]**：打包了docker镜像并上传
