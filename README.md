@@ -13,6 +13,15 @@
 ```bash
 git clone https://github.com/akiooo45/upreador.git
 ```
+创建虚拟环境
+```bash
+python3 -m venv venv
+```
+
+激活虚拟环境
+```bash
+source venv/bin/activate
+```
 
 安装依赖
 
